@@ -32,6 +32,7 @@ export type Order = {
   shipping: { method: string; cost: number; tracking: string };
   totals: { subtotal: number; shipping: number; total: number };
   notes: string;
+  stripeSessionId?: string;
 };
 type Config = { supplierEmail: string; fromEmail: string; resendApiKey: string; webhookUrl: string };
 
@@ -108,4 +109,40 @@ export async function notifySupplier(order: Order): Promise<void> {
 
 export function newOrderId(): string {
   return "AR-" + Date.now().toString(36).toUpperCase() + crypto.randomBytes(2).toString("hex").toUpperCase();
+}
+
+// Shared cart/contact/address validation used by both the free order-creation
+// route and the Stripe checkout route, so the two stay in lockstep.
+export function buildOrderFromInput(b: Record<string, unknown>): Order | { error: string } {
+  const rawItems = Array.isArray(b.items) ? (b.items as { id: string; qty: number }[]) : [];
+  const items: OrderItem[] = rawItems
+    .filter((i) => PRICES[i.id] && Number.isInteger(i.qty) && i.qty > 0 && i.qty <= 50)
+    .map((i) => ({ id: i.id, name: NAMES[i.id], qty: i.qty, price: PRICES[i.id] }));
+  if (!items.length) return { error: "cart empty or invalid" };
+
+  const shipMethod = SHIPPING[b.shipping as string] !== undefined ? (b.shipping as string) : "standard";
+  const c = (b.contact ?? {}) as Record<string, unknown>;
+  const a = (b.address ?? {}) as Record<string, unknown>;
+  const contact = {
+    firstName: clean(c.firstName, 60), lastName: clean(c.lastName, 60), email: clean(c.email, 120),
+  };
+  const address = {
+    street: clean(a.street), city: clean(a.city, 80),
+    postcode: clean(a.postcode, 20), country: clean(a.country, 60),
+  };
+  if (!contact.firstName || !contact.email || !address.street || !address.city || !address.country) {
+    return { error: "missing contact or address fields" };
+  }
+
+  const subtotal = items.reduce((n, i) => n + i.price * i.qty, 0);
+  const shippingCost = SHIPPING[shipMethod];
+  return {
+    id: newOrderId(),
+    createdAt: new Date().toISOString(),
+    status: "new",
+    items, contact, address,
+    shipping: { method: shipMethod, cost: shippingCost, tracking: "" },
+    totals: { subtotal, shipping: shippingCost, total: subtotal + shippingCost },
+    notes: "",
+  };
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CATALOG, money } from "@/lib/catalog";
 import { useCart } from "@/lib/cart";
@@ -18,15 +19,29 @@ const input =
 const step = "text-[1.15rem] mt-8 mb-4 flex items-center gap-3 first:mt-0";
 
 export default function Checkout() {
+  return (
+    <Suspense>
+      <CheckoutInner />
+    </Suspense>
+  );
+}
+
+function CheckoutInner() {
   const { cart, setQty, clear } = useCart();
+  const params = useSearchParams();
   const [ship, setShip] = useState("standard");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [done, setDone] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(params.get("order"));
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "",
     street: "", city: "", postcode: "", country: "",
   });
+
+  useEffect(() => {
+    if (params.get("order")) clear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const ids = Object.keys(cart).filter((id) => CATALOG[id]);
   const subtotal = useMemo(
@@ -42,7 +57,7 @@ export default function Checkout() {
     setBusy(true);
     setErr(null);
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -52,14 +67,11 @@ export default function Checkout() {
           address: { street: form.street, city: form.city, postcode: form.postcode, country: form.country },
         }),
       });
-      if (!res.ok) throw new Error((await res.json()).error || "order failed");
-      const order = await res.json();
-      clear();
-      setDone(order.id);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (!res.ok) throw new Error((await res.json()).error || "checkout failed");
+      const { url } = await res.json();
+      window.location.href = url;
     } catch (e) {
       setErr((e as Error).message);
-    } finally {
       setBusy(false);
     }
   }
@@ -124,19 +136,11 @@ export default function Checkout() {
                 ))}
               </div>
 
-              <h3 className={step}><span className="mono text-or">04</span> Payment</h3>
-              <p className="mono text-mut text-[0.6rem] mb-2">DEMO MODE — NO REAL CHARGE. CONNECT STRIPE BEFORE LAUNCH.</p>
-              <input className={input} placeholder="Card number" inputMode="numeric" maxLength={19} />
-              <div className="grid grid-cols-2 gap-3">
-                <input className={input} placeholder="MM / YY" maxLength={7} />
-                <input className={input} placeholder="CVC" inputMode="numeric" maxLength={4} />
-              </div>
-
               {err && <p className="text-[#dc2626] text-sm mb-3">{err}</p>}
               <button type="submit" disabled={busy} className={`${btnClass("solid", "lg")} w-full mt-3 disabled:opacity-60`}>
-                {busy ? "Placing order…" : "Place Order"}
+                {busy ? "Redirecting to payment…" : "Continue to Payment"}
               </button>
-              <p className="mono text-mut text-[0.6rem] text-center mt-3">SECURE CHECKOUT · VISA · MASTERCARD · PAYPAL · APPLE PAY</p>
+              <p className="mono text-mut text-[0.6rem] text-center mt-3">SECURE CHECKOUT VIA STRIPE · VISA · MASTERCARD · APPLE PAY</p>
             </form>
 
             <aside className="bg-white border border-line rounded-[20px] p-8 md:sticky md:top-[100px]">
