@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #faf8f4;
+  --color-ink: #141210;
+  --color-mut: #8a837a;
+  --color-line: #e5e0d6;
+  --color-or: #ff5c00;
+  --color-ye: #ffb800;
+  --color-star: #ff9500;
+
+  --font-sans: var(--font-grotesk), sans-serif;
+  --font-mono: var(--font-jbmono), monospace;
+
+  --shadow-warm: 0 24px 60px rgba(120, 70, 10, 0.10);
+  --shadow-warm-sm: 0 10px 30px rgba(120, 70, 10, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background:
+    radial-gradient(1100px 700px at 85% -5%, rgba(255,184,0,.5), transparent 65%),
+    radial-gradient(900px 800px at -12% 28%, rgba(255,92,0,.32), transparent 62%),
+    radial-gradient(1100px 900px at 112% 72%, rgba(255,140,0,.38), transparent 68%),
+    radial-gradient(800px 600px at 15% 100%, rgba(255,184,0,.3), transparent 65%),
+    var(--color-bg);
+  background-attachment: fixed;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.045em; line-height: 0.98; }
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.grad-text {
+  background: linear-gradient(90deg, var(--color-or), var(--color-ye));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.stars { color: var(--color-star); letter-spacing: 0.08em; }
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--color-or);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes pulse { 50% { opacity: 0.3; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-marquee, .animate-pulse-dot { animation: none !important; }
+}
+
+.animate-marquee { animation: marquee 30s linear infinite; }
+.animate-pulse-dot { animation: pulse 2s infinite; }
