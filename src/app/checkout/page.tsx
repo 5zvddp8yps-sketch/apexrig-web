@@ -97,7 +97,7 @@ function CheckoutInner() {
           <div className="text-center py-20 grid gap-4 place-items-center">
             <h3 className="text-[2rem]">Your cart is empty.</h3>
             <p className="text-mut">The grid is waiting.</p>
-            <Link href="/#lineup" className={btnClass("solid", "md")}>Browse the Lineup</Link>
+            <Link href="/lineup" className={btnClass("solid", "md")}>Browse the Lineup</Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-12 mt-12 items-start">

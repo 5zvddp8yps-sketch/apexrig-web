@@ -38,10 +38,10 @@ export function Nav() {
         APEXRIG<sup className="text-or text-[0.55em]">®</sup>
       </Link>
       <nav className="hidden md:flex gap-8 text-[0.85rem]">
-        <a href="/#rig" className="hover:text-or">The Rig</a>
-        <a href="/#reviews" className="hover:text-or">Reviews</a>
-        <a href="/#lineup" className="hover:text-or">Lineup</a>
-        <a href="/#faq" className="hover:text-or">FAQ</a>
+        <Link href="/the-rig" className="hover:text-or">The Rig</Link>
+        <Link href="/reviews" className="hover:text-or">Reviews</Link>
+        <Link href="/lineup" className="hover:text-or">Lineup</Link>
+        <Link href="/faq" className="hover:text-or">FAQ</Link>
       </nav>
       <div className="flex items-center gap-5">
         <Link href="/checkout" className="mono text-[0.72rem] hover:text-or">
@@ -102,6 +102,32 @@ export function Toast() {
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+export function Footer() {
+  return (
+    <footer className="px-[6vw] pt-20 pb-10 border-t border-line">
+      <div className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-10 max-w-[1200px] mx-auto">
+        <div>
+          <p className="font-bold text-[1.3rem] mb-3">APEXRIG<sup className="text-or text-[0.55em]">®</sup></p>
+          <p className="text-mut max-w-[20rem] text-[0.9rem]">Sim racing gear for people who chase tenths.</p>
+        </div>
+        {([["SHOP", [["GT Pro", "/"], ["Full lineup", "/lineup"], ["Specs", "/the-rig"]]],
+          ["SUPPORT", [["Track order", "/track"], ["FAQ", "/faq"], ["Contact", "mailto:support@apexrig.example"]]],
+          ["COMPANY", [["Reviews", "/reviews"], ["Instagram", "#"], ["YouTube", "#"]]]] as const).map(([h, links]) => (
+          <div key={h}>
+            <h4 className="mono text-[0.6rem] text-mut mb-3.5">{h}</h4>
+            {links.map(([t, href]) => (
+              <Link key={t} href={href} className="block text-[0.92rem] py-1.5 hover:text-or">{t}</Link>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="max-w-[1200px] mx-auto mt-12 pt-6 border-t border-line mono text-[0.6rem] text-mut tracking-[0.14em]">
+        © 2026 APEXRIG · PRIVACY · TERMS
+      </div>
+    </footer>
   );
 }
 
