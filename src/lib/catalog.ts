@@ -74,6 +74,7 @@ export const CATALOG: Record<string, Product> = {
     desc: "Our top rig: an orange-accented sport shell seat, heavy reinforced chassis and a full integrated monitor mount — the complete cockpit, wheel-deck to screen, in one premium package.",
     img: "/images/product-apex.png",
     specs: [["SEAT", "Sport shell · orange accents"], ["EXTRAS", "Integrated monitor mount"], ["CHASSIS", "Heavy reinforced steel"], ["RATED FOR", "Direct drive 25 Nm+"]],
+    angles: 6,
   },
 };
 
