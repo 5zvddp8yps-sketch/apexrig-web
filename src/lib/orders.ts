@@ -72,10 +72,16 @@ export async function writeOrders(orders: Order[]): Promise<void> {
   fs.renameSync(tmp, ORDERS_FILE);
 }
 
-async function readConfig(): Promise<Config> {
+export async function readConfig(): Promise<Config> {
   if (hasDb()) return (await kvGet<Config>("config")) ?? DEFAULT_CONFIG;
   ensureFileStore();
   return JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8"));
+}
+
+export async function writeConfig(cfg: Config): Promise<void> {
+  if (hasDb()) return kvSet("config", cfg);
+  ensureFileStore();
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(cfg, null, 2));
 }
 
 export function clean(v: unknown, max = 200): string {

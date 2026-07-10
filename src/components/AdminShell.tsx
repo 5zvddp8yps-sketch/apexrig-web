@@ -20,6 +20,7 @@ export function logout(router: ReturnType<typeof useRouter>) {
 const NAV = [
   { href: "/admin", label: "Orders" },
   { href: "/admin/analytics", label: "Analytics" },
+  { href: "/admin/settings", label: "Settings" },
 ];
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {
